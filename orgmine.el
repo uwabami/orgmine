@@ -475,8 +475,8 @@ whose host is BASE-URL."
     (orgmine-mode t)
     (save-excursion
       (orgmine-insert-issue issue-id))
-    (hide-subtree)
-    (show-branches)
+    (outline-hide-subtree)
+    (outline-show-branches)
     (org-align-tags t)
     (set-buffer-modified-p nil)
     (run-hooks 'orgmine-issue-buffer-hook)
@@ -1209,7 +1209,7 @@ as a cons cell (BEG . END)."
   "Returns the region from the beginning of body to the next headline
 as a cons cell (BEG . END)."
   (org-back-to-heading t)
-  (show-subtree)
+  (outline-show-subtree)
   (save-excursion
     (forward-line)
     (if (not (org-at-heading-p t))
@@ -1699,7 +1699,7 @@ Returns non-nil if the entry is updated."
        (goto-char beg)
        (let ((end (make-marker)))
 	 (set-marker end (cdr (orgmine-subtree-region)))
-	 (show-subtree)
+	 (outline-show-subtree)
 	 (orgmine-update-title title)
 	 (goto-char beg)
          (orgmine-toggle-tag orgmine-tag-update-me 'off)
@@ -1711,7 +1711,7 @@ Returns non-nil if the entry is updated."
 	 (if (functionp extra)
 	     (funcall extra plist beg end))
 	 (set-marker end nil)
-	 (hide-subtree)))
+	 (outline-hide-subtree)))
       (message "Updating entry #%s ... done" idname))))
 
 ;;;;
@@ -1722,7 +1722,7 @@ Returns non-nil if the entry is updated."
 					  &optional force no-prompt)
   "Submit the entry update to Redmine."
   (org-save-outline-visibility t
-    (show-branches)
+    (outline-show-branches)
     (let* ((plist (orgmine-collect-update-plist entry subject-prop))
  	   (id (plist-get plist id-prop)))	; XXX
       (unless id
@@ -2267,7 +2267,7 @@ NB: the journal is not submitted to the server."
 	 (id (orgmine-get-id beg))
 	 (journal (list :id nil :created_on nil :user nil :notes "\n")))
     (goto-char beg)
-    (show-branches)
+    (outline-show-branches)
     (if arg
 	(orgmine-find-journals end nil t)
       (orgmine-find-journals end t t)
@@ -2305,7 +2305,7 @@ NB: the description is not submitted to the server."
 		      (orgmine-subtree-region)))
 	 (beg (car region))
 	 (end (copy-marker (cdr region))))
-    (show-branches)
+    (outline-show-branches)
     (if arg
 	(unless (orgmine-find-description end)
 	  (goto-char pos)
@@ -2344,7 +2344,7 @@ NB: the attachments is not submitted to the server."
 		      (orgmine-subtree-region)))
 	 (beg (car region))
 	 (end (copy-marker (cdr region))))
-    (show-branches)
+    (outline-show-branches)
     (if arg
 	(unless (orgmine-find-attachments end)
 	  (goto-char pos)
@@ -2353,7 +2353,7 @@ NB: the attachments is not submitted to the server."
 	  (message "attachments entry already exist.")
 	(orgmine-insert-attachments nil beg end t)
 	(forward-line -1))
-      (show-entry)
+      (outline-show-entry)
       (org-toggle-tag orgmine-tag-update-me 'on)
       (outline-next-heading)
       (open-line 1)
@@ -2376,7 +2376,7 @@ NB: the attachments is not submitted to the server."
 	     fixed-version))
 ;;     (org-insert-heading arg)
 ;;     (org-toggle-tag orgmine-tag-version 'on)
-    (show-branches)
+    (outline-show-branches)
     (move-beginning-of-line nil)
     (orgmine-insert-demoted-heading "" (list orgmine-tag-version))
     (org-set-property "om_fixed_version" fixed-version)
@@ -2852,16 +2852,6 @@ found in the region from BEG to END."
        "om_me property not found. define it by \"#+PROPERTY om_me\" line"))
     (orgmine-show-assigned-to me todo-only)))
 
-(defun orgmine-show-assigned-to (who todo-only)
-  "Show entries author of WHO."
-  (interactive (list (completing-read
-		      "Author: "
-		      (mapcar #'list (org-property-values "author")))
-		     current-prefix-arg))
-  (let ((match (format "%s+om_author=\"%s\"" orgmine-tag-issue who))
-	(what (format "issues whose author is %s..." who)))
-    (orgmine-match-sparse-tree todo-only match what)))
-
 (defun orgmine-show-category (category)
   "Show entries of CATEGORY."
   (interactive (list (completing-read
@@ -3052,7 +3042,7 @@ in depth first manner."
   (let* ((region (orgmine-subtree-region))
 	 (beg (car region))
 	 (end (copy-marker (cdr region))))
-    (show-branches)
+    (outline-show-branches)
     (save-excursion
       (if (org-goto-first-child)
 	  (orgmine-map-region (lambda ()
@@ -3118,7 +3108,7 @@ in depth first manner."
 	  (id (orgmine-get-id beg id-prop)))
      (unless id (error "Redmine issue headline without ID (om_id prop)"))
      (narrow-to-region beg end)
-     (show-all)
+     (outline-show-all)
      (goto-char (point-min))
      (let ((level (funcall outline-level))
 	   (buf-a (get-buffer-create "*ORGMINE-LATEST*"))
@@ -3136,7 +3126,7 @@ in depth first manner."
 ;; 	 (goto-char (point-max))
 ;; 	 (unless (bolp) (insert "\n"))
 	 (goto-char (point-min))
-	 (show-all)
+	 (outline-show-all)
 	 (set-buffer-modified-p nil)
 	 (read-only-mode))
        (defvar orgmine-ediff-buf-a)
@@ -3293,7 +3283,7 @@ Then entry could be an issue, version, tracker or project."
 
 ;; (defun orgmine-body-block-before-subtree ()
 ;;   (org-back-to-heading t)
-;;   (show-subtree)
+;;   (outline-show-subtree)
 ;;   (save-excursion
 ;;     (forward-line)
 ;;     (if (not (org-at-heading-p t))
@@ -3306,7 +3296,7 @@ TYPE is any of 'issue, 'fixed_version, 'tracker, 'project.
 All properties are removed but PROPERTY-LIST.
 If TODO-KEYWORD is not null, set TODO Keyword to TODO-KEYWORD."
   (unless (org-at-heading-p t) (error "not a headline."))
-  (show-subtree)
+  (outline-show-subtree)
   (let ((properties (orgmine-get-properties nil property-list))
         (title (orgmine-extract-subject
                 (substring-no-properties (org-get-heading t t))))
@@ -3368,7 +3358,7 @@ If TODO-KEYWORD is not null, set TODO Keyword to TODO-KEYWORD."
   (setq end (copy-marker end))
   (org-with-wide-buffer
    (goto-char beg)
-   (show-subtree)
+   (outline-show-subtree)
    (while (re-search-forward "^\\*+ " end t)
      (save-excursion
        (let ((tags (org-get-tags)))
