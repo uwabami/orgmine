@@ -1,5 +1,4 @@
 ;;; orgmine.el --- minor mode for org-mode with redmine integration
-
 ;; Copyright (C) 2015-2017 Tokuya Kameshima
 
 ;; Author: Tokuya Kameshima <kametoku at gmail dot com>
@@ -60,31 +59,37 @@
 (defcustom orgmine-issue-title-format
   "[[redmine:issues/%{id}][#%{id}]] %{subject}"
   "Title format for issue entry."
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'string)
 
 (defcustom orgmine-journal-title-format
   "[[redmine:issues/%{id}#note-%{count}][V#%{id}-%{count}]] %{created_on} %{author}"
   "Title format for journal entry."
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'string)
 
 (defcustom orgmine-version-title-format
   "[[redmine:versions/%{id}][V#%{id}]] %{name}"
   "Title format for version entry."
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'string)
 
 (defcustom orgmine-tracker-title-format "%{name}"
   "Title format for tracker entry."
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'string)
 
 (defcustom orgmine-project-title-format
   "[[redmine:projects/%{identifier}][%{identifier}]] %{name}"
   "Title format for project entry."
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'string)
 
 (defcustom orgmine-wiki-page-title-format
   "[[redmine:projects/%{project}/wiki/%{title}][%{title}]]"
   "Title format for wiki page entry."
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'string)
 
 (defcustom orgmine-title-format-regexp
   (let ((brackert-link-regexp
@@ -92,29 +97,35 @@
     (concat "^[ \t]*" brackert-link-regexp "[ \t]*\\(.*?\\)"
 	    "[ \t]*\\(?:(" brackert-link-regexp ")\\)?$"))
   "Regular express to extract subject part from headline title."
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'regexp)
 
 (defcustom orgmine-user-name-format "%{firstname} %{lastname}"
   "User name format."
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'string)
 
 (defcustom orgmine-attachment-format
   (concat "[[%{content_url}][%{filename}]] (%{filesize} bytes)"
 	  " %{author.name} %{created_on}")
   "attachment item format."
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'string)
 
 (defcustom orgmine-journal-details-drawer "DETAILS"
   "Drawer name to hold journal details."
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'string)
 
 (defcustom orgmine-note-block-begin "#+begin_src gfm"
   ""
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'string)
 
 (defcustom orgmine-note-block-end "#+end_src"
   ""
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'string)
 
 (defcustom orgmine-tags
   '((update-me . "UPDATE_ME")
@@ -131,7 +142,8 @@
     (attachments . "attachments")
     (wiki . "wiki"))
   "Alist of tags which are used in orgmine mode."
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'alist)
 
 (defvar orgmine-tag-update-me)
 (defvar orgmine-tag-create-me)
@@ -172,7 +184,8 @@
      (default-todo-keyword . "New")))
   "An alist of redmine servers.
 Each element has the form (NAME CONFIGURATION)."
-  :group 'orgmine)
+  :group 'orgmine
+  :type 'alist)
 
 (defcustom orgmine-setup-hook nil
   "Hook called in `orgmine-setup'."
@@ -1041,18 +1054,13 @@ Only the properties provided in PROPERTY-LIST are updated."
 a plist of (:id ID :name NAME)."
   (memq property orgmine-id-properties))
 
-(defun orgmine-entry-properties (&optional pom which)
+(define-obsolete-function-alias 'orgmine-entry-properties 'org-entry-properties "2026-03-09"
   "Workaround for old `org-entry-properties' that cannot get properties
-from the headline property drawer."
-  (condition-case err
-      (org-entry-properties pom which "")
-    (error
-     (if (eq (car err) 'wrong-number-of-arguments)
-	 (org-entry-properties pom which)))))
+ from the headline property drawer.")
 
 (defun orgmine-get-property-custom-fields (pom &optional properties)
   (or properties
-      (setq properties (orgmine-entry-properties pom 'all)))
+      (setq properties (org-entry-properties pom 'all)))
   (let (custom-fields)
     (mapc (lambda (property)
 	    (let* ((name (car property))
@@ -1095,7 +1103,7 @@ from the headline property drawer."
 
 (defun orgmine-get-property-relations (pom &optional properties)
   (or properties
-      (setq properties (orgmine-entry-properties pom 'all)))
+      (setq properties (org-entry-properties pom 'all)))
   (let* ((issue (orgmine-find-headline-ancestor orgmine-tag-issue t))
 	 (beg (org-element-property :begin issue))
 	 (id (orgmine-get-id beg))
@@ -1133,7 +1141,7 @@ from the headline property drawer."
 ;; 			(org-show-hidden-entry) ;XXX
 			(org-entry-get pom name inherit t))
 ;; 		    (or properties
-;; 			(setq properties (orgmine-entry-properties pom 'all)))
+;; 			(setq properties (org-entry-properties pom 'all)))
 		    (cdr (assoc-string name properties t)))))
       (if value
 	  (let ((redmine-value
@@ -1147,7 +1155,7 @@ from the headline property drawer."
 (defun orgmine-get-properties (pom property-list &optional inherit for-filter)
   "Get properties from the headline at point-or-maker POM.
 Only the properties given by PROPERTY-LIST are retrieved."
-  (let ((properties (unless inherit (orgmine-entry-properties pom 'all)))
+  (let ((properties (unless inherit (org-entry-properties pom 'all)))
 	plist)
     (mapc (lambda (property)
 	    (let ((list (orgmine-get-property pom property
@@ -2359,7 +2367,7 @@ NB: the attachments is not submitted to the server."
       (open-line 1)
       (insert "x") ;; dummy char to indent properly
       (org-indent-line)
-      (delete-backward-char 1)
+      (delete-char 1)
       (insert "- ")
       (message "Please insert a \"file:\" link here to be attached."))
     (set-marker end nil)))
@@ -2537,7 +2545,7 @@ set PROPERTY to VALUE."
 		  (orgmine-upload-attachents plist)))
 	    (if uploads
 		(setq plist
-		      (plist-merge plist :uploads uploads :attachments nil)))
+		      (plist-merge plist (list :uploads uploads :attachments nil))))
 	    (let* ((res-plist (elmine/create-issue plist))
 		   (redmine-issue (plist-get res-plist :issue))
 		   (id (plist-get redmine-issue :id)))
