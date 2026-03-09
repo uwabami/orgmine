@@ -18,9 +18,12 @@ available from MELPA.  Install these packages as well.
 - [[http://jblevins.org/projects/markdown-mode/][markdown-mode]] --- Emacs Major mode for Markdown-formatted text files.
 - [[https://github.com/tkf/emacs-request][request]] --- Compatible layer for URL request in Emacs.
 
-=orgmine= was developed and tested on the following environment:
-- GNU Emacs 24.3.1
-- Org-mode 8.3.2
+=orgmine= requires at least:
+- GNU Emacs >= 25.1
+- Org-mode >= 9.0
+
+Note: While Emacs 25.1 is the minimum, please ensure Org-mode is updated to 9.0+
+if you are using the version bundled with Emacs 25, which defaults to Org 8.2.10.
 
 ** Download and put orgmine.el to a directory in `load-path'.
 
@@ -147,7 +150,7 @@ The following is an example of =orgmine-tags= setting.
                        (wiki . "wiki")))
 #+end_src
 
-*** #+PROPERTY settings 
+*** #+PROPERTY settings
 
 This setting is a very important part of settings in the org-mode file.
 
@@ -168,12 +171,12 @@ This setting is a very important part of settings in the org-mode file.
 | om_assigned_to_ALL | Wish | users of the project                            |
 | om_done_ratio_ALL  | Wish | done_ratio values 0 to 100 stepped by 10        |
 | om_tracker_ALL     | Wish | tracker IDs with their names                    |
-| om_me              | Wish | my user ID followed by ":" and its name         | 
+| om_me              | Wish | my user ID followed by ":" and its name         |
 
 The property =om_server= determines which server setting in
 =orgmine-server-list= should be used.
 
-*** #+COLUMNS settings (optional) 
+*** #+COLUMNS settings (optional)
 
 #+begin_src org
   ,#+COLUMNS: %50ITEM(Task) %9om_assigned_to(Assigned) %8om_tracker(Tracker) %5Effort(Est.){:} %CLOCKSUM(Clock) %SCHEDULED %DEADLINE %TAGS
