@@ -4,6 +4,8 @@
 ;; Author: Tokuya Kameshima <kametoku at gmail dot com>
 ;; Keywords: outlines, hypermedia, calendar, wp
 ;; Homepage: https://github.com/kametoku/orgmine
+;; Package-Requires: ((emacs "25.1") (org "9.0") (cl-lib "0.5") (json "1.4") (request "0.3.2") (elmine "0"))
+;; Version: 20260309.01
 
 ;; This file is not part of GNU Emacs.
 ;;
